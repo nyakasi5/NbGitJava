@@ -5,16 +5,36 @@
  */
 package GUI;
 
-import java.awt.Dimension;
-import static java.awt.Frame.MAXIMIZED_BOTH;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 import model.Imodel;
+import model.Kanok;
+import model.Kocak;
+import model.Tenyesztes;
+
+
 
 /**
  *
  * @author Nyakas István <30/7323629>
  */
-public class TenyesztesDialog extends javax.swing.JDialog {
+public class TenyesztesDialog extends javax.swing.JDialog implements TableModelListener {
 
+    private java.awt.Frame parent;
+    private Imodel model;
+    private List<Kanok> kanok;
+    private List<Kocak> kocak;
+    private List<Tenyesztes> tenyesztes;
+    private Map<Integer, Kocak> KocakMap;
+    private Map<Integer, Kanok> KanokMap;
+    private Map<Integer, Tenyesztes> TenyesztesMap; 
     
     public TenyesztesDialog(java.awt.Frame parent, boolean modal, Imodel model) {
         super(parent, modal);
@@ -25,10 +45,26 @@ public class TenyesztesDialog extends javax.swing.JDialog {
         
         setLocationRelativeTo(null);
         // teljes ablakméret beállítása
-       
-    }
+       this.parent= parent;
+       this.model=model;
+       try {
+            kocak = model.getAllKocak();
+            KocakMap = model.getKocakMap();
 
-   
+            cbKocak.setModel(new DefaultComboBoxModel(kocak.toArray()));
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(rootPane, ex,
+                    "Adatbázis hiba!", JOptionPane.ERROR_MESSAGE);
+        }
+       
+                     
+
+//DefaultTableModel dtm = (DefaultTableModel) tblTenyesztes.getModel();
+//        dtm.addTableModelListener(this);
+      
+    }
 
    
     @SuppressWarnings("unchecked")
@@ -39,7 +75,7 @@ public class TenyesztesDialog extends javax.swing.JDialog {
         jbOk = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTenyesztes = new javax.swing.JTable();
-        cbKocak = new javax.swing.JComboBox<>();
+        cbKocak = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         jbTermekenyites = new javax.swing.JButton();
 
@@ -79,7 +115,11 @@ public class TenyesztesDialog extends javax.swing.JDialog {
         });
         jScrollPane2.setViewportView(tblTenyesztes);
 
-        cbKocak.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbKocak.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbKocakActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabel1.setText("Koca:");
@@ -103,7 +143,7 @@ public class TenyesztesDialog extends javax.swing.JDialog {
                 .addComponent(jbSzerkeszt)
                 .addGap(34, 34, 34)
                 .addComponent(jbTermekenyites)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 304, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 523, Short.MAX_VALUE)
                 .addComponent(jbOk, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(21, 21, 21))
         );
@@ -129,17 +169,44 @@ public class TenyesztesDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
+        cbKocak.getAccessibleContext().setAccessibleParent(cbKocak);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
+        // ablak bezárása
         setVisible(false);
     }//GEN-LAST:event_jbOkActionPerformed
+
+    private void cbKocakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbKocakActionPerformed
+
+//        Kocak kivalasztott= (Kocak) cbKocak.getSelectedItem();
+//
+//        if (kivalasztott != null) {
+//
+//            try {
+//                Kocak = model.getAllKocak(kivalasztott);
+//
+//                refreshTable();
+//
+//            } catch (SQLException ex) {
+//                JOptionPane.showMessageDialog(rootPane, ex,
+//                        "Adatbázis hiba!", JOptionPane.ERROR_MESSAGE);
+//            }
+//        }
+//    }                  
+// alapbeállítás az első koszam
+        
+        // Itt választjuk ki az adatbázisból a koszamot és feltöltjük at táblázatott a 
+        // kiválasztott koca termékenyítési adataival (Iid) sorrendben
+        
+    }//GEN-LAST:event_cbKocakActionPerformed
 
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbKocak;
+    private javax.swing.JComboBox cbKocak;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton jbOk;
@@ -147,4 +214,8 @@ public class TenyesztesDialog extends javax.swing.JDialog {
     private javax.swing.JButton jbTermekenyites;
     private javax.swing.JTable tblTenyesztes;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void tableChanged(TableModelEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");  }
 }
